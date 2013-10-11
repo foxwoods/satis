@@ -268,7 +268,8 @@ EOT
         $endpoint = isset($config['archive']['prefix-url']) ? $config['archive']['prefix-url'] : $config['homepage'];
         $skipDev = isset($config['archive']['skip-dev']) ? (bool) $config['archive']['skip-dev'] : false;
 
-        $composerConfig = Factory::createConfig();
+        $composer = $this->getApplication()->getComposer(true, $config);
+        $composerConfig = $composer->getConfig();
         $factory = new Factory;
 
         /* @var \Composer\Package\Archiver\ArchiveManager $archiveManager */
