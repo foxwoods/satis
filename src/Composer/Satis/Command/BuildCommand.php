@@ -267,6 +267,8 @@ EOT
         $format = isset($config['archive']['format']) ? $config['archive']['format'] : 'zip';
         $endpoint = isset($config['archive']['prefix-url']) ? $config['archive']['prefix-url'] : $config['homepage'];
         $skipDev = isset($config['archive']['skip-dev']) ? (bool) $config['archive']['skip-dev'] : false;
+        $whitelist = isset($config['archive']['whitelist']) ? (array) $config['archive']['whitelist'] : array();
+        $blacklist = isset($config['archive']['blacklist']) ? (array) $config['archive']['blacklist'] : array();
 
         $composer = $this->getApplication()->getComposer(true, $config);
         $composerConfig = $composer->getConfig();
@@ -282,6 +284,17 @@ EOT
 
             if (true === $skipDev && true === $package->isDev()) {
                 $output->writeln(sprintf("<info>Skipping '%s' (is dev)</info>", $name));
+                continue;
+            }
+
+            $names = $package->getNames();
+            if ($whitelist && !array_intersect($whitelist, $names)) {
+                $output->writeln(sprintf("<info>Skipping '%s' (is not in whitelist)</info>", $name));
+                continue;
+            }
+
+            if ($blacklist && array_intersect($blacklist, $names)) {
+                $output->writeln(sprintf("<info>Skipping '%s' (is in blacklist)</info>", $name));
                 continue;
             }
 
